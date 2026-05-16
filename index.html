@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mutual Fund Brief</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f5f0e8;
+    --ink: #141414;
+    --ink-soft: #4a4a4a;
+    --rule: #2a2a2a;
+    --rule-soft: #c9bfae;
+    --accent: #6b2c2c;
+    --accent-soft: #b04a3a;
+    --pos: #2e5c3a;
+    --neg: #8a2a2a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+    font-feature-settings: "tnum" 1, "lnum" 1, "kern" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 28px 96px;
+  }
+  @media (min-width: 720px) {
+    .wrap { padding: 72px 40px 120px; }
+  }
+
+  /* Masthead */
+  .masthead {
+    border-top: 2px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 14px 0 12px;
+    margin-bottom: 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .masthead .title { font-weight: 600; }
+  .masthead .date { color: var(--ink-soft); font-weight: 400; letter-spacing: 0.14em; }
+
+  /* Hero */
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 38px;
+    line-height: 1.15;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    margin: 0 0 16px;
+    color: var(--ink);
+  }
+  @media (min-width: 720px) { h1 { font-size: 44px; } }
+
+  .lede {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 0 0 56px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  /* Section headings */
+  h2 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 13px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 400;
+    color: var(--accent);
+    margin: 56px 0 18px;
+    padding-top: 0;
+  }
+  h2::before {
+    content: "";
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+    margin-bottom: 14px;
+  }
+  h3 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 22px;
+    line-height: 1.3;
+    font-weight: 400;
+    margin: 28px 0 8px;
+    color: var(--ink);
+  }
+  h4 {
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 24px 0 6px;
+  }
+  p { margin: 0 0 16px; }
+  .num { font-variant-numeric: tabular-nums; }
+  .pos { color: var(--pos); }
+  .neg { color: var(--neg); }
+  .muted { color: var(--ink-soft); }
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+
+  /* Fund entry blocks */
+  .fund {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .fund:last-child { border-bottom: none; }
+  .fund .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .fund .name {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 18px;
+    line-height: 1.3;
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .fund .nav {
+    font-size: 13px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .fund .note {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-top: 6px;
+  }
+  .fund.flagged { background: rgba(107, 44, 44, 0.04); margin: 0 -16px; padding: 18px 16px; }
+  .fund.flagged .name { color: var(--accent); }
+
+  .flag-tag {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 2px 8px;
+    margin-right: 8px;
+    vertical-align: 2px;
+  }
+
+  /* Watching closely - red flag callouts */
+  .watch {
+    padding: 24px 24px 8px;
+    background: rgba(107, 44, 44, 0.06);
+    border-left: 2px solid var(--accent);
+    margin-bottom: 24px;
+  }
+  .watch .head {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    color: var(--accent);
+  }
+  .watch .sub {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-soft);
+    margin-bottom: 14px;
+  }
+  .watch p {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+
+  /* NFO list */
+  .nfo {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .nfo:last-child { border-bottom: none; }
+  .nfo .name {
+    font-family: Georgia, serif;
+    font-size: 17px;
+    line-height: 1.35;
+    margin-bottom: 4px;
+  }
+  .nfo .meta {
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  /* Worth a Look - editorial pick */
+  .pick {
+    margin: 24px 0 8px;
+    padding: 32px 28px;
+    background: var(--ink);
+    color: #efe9dc;
+    border-radius: 0;
+  }
+  .pick .label {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #c0b094;
+    margin-bottom: 14px;
+  }
+  .pick h3 {
+    font-family: Georgia, serif;
+    font-size: 26px;
+    line-height: 1.25;
+    font-weight: 400;
+    color: #f5f0e8;
+    margin: 0 0 14px;
+  }
+  .pick p {
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: #d9d0bb;
+    margin-bottom: 14px;
+  }
+  .pick p:last-child { margin-bottom: 0; }
+  .pick .skiprow {
+    border-top: 1px solid #3a3a3a;
+    margin-top: 18px;
+    padding-top: 16px;
+    font-size: 13.5px;
+    color: #b8a988;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 2px solid var(--rule);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    line-height: 1.7;
+  }
+  footer .heading {
+    font-family: Georgia, serif;
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  footer .small {
+    margin-top: 18px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <span class="title">Mutual Fund Brief</span>
+    <span class="date">Saturday · May 16, 2026</span>
+  </div>
+
+  <h1>Two of your funds need watching. The other seven are quietly compounding.</h1>
+
+  <p class="lede">A weekly review of your nine-fund portfolio - what changed, what's worth ignoring, and where new launches are pointing. Performance noted lightly; structural shifts and red flags emphasised.</p>
+
+  <!-- WATCHING CLOSELY -->
+  <h2>Watching Closely</h2>
+
+  <div class="watch">
+    <div class="sub">Red flag · Regulatory</div>
+    <div class="head">Quant Multi Cap</div>
+    <p>The SEBI front-running investigation that began in June 2024 remains unresolved. One-year returns have slid into negative territory (-4.70%), well below the multi-cap category average, and the fund continues to bleed assets through investor redemptions. Concentration in Adani-group names adds a second layer of risk on top of the governance overhang.</p>
+    <p class="muted" style="font-size: 14px;">Your money is held in trust, separate from the AMC - safety of corpus isn't the issue. The question is whether the governance and performance combination justifies staying. A reasonable stance: pause fresh SIP additions, monitor monthly, decide on full exit once SEBI files (or doesn't) a formal order.</p>
+  </div>
+
+  <div class="watch">
+    <div class="sub">Red flag · Management change</div>
+    <div class="head">Motilal Oswal Midcap</div>
+    <p>Niket Shah, who managed the fund from 2020 through its strongest years, exited in January 2026. He's been replaced by Ankit Agarwal and Varun Sharma. The transition coincided with a record single-month outflow of ₹2,448 crore and one-year returns of -8.07% - the fund's worst stretch in years.</p>
+    <p class="muted" style="font-size: 14px;">New manager performance typically takes 12-18 months to read clearly. Hold-and-watch is the conventional move; reallocate only if a clear strategy drift becomes visible by Q3 FY27 earnings season.</p>
+  </div>
+
+  <!-- YOUR FUNDS -->
+  <h2>Your Funds This Week</h2>
+
+  <div class="fund">
+    <div class="top">
+      <div class="name">Parag Parikh Flexi Cap</div>
+      <div class="nav">NAV ₹90.65</div>
+    </div>
+    <div class="note">No manager changes. Cash + arbitrage + debt cushion at 15.51% - the highest in the large-fund universe and a reliable PPFAS signature. April additions were broad-based across banks, IT, pharma, FMCG, autos and gas with no single-sector bet. Reads as steady and disciplined.</div>
+  </div>
+
+  <div class="fund">
+    <div class="top">
+      <div class="name">Nippon India Small Cap</div>
+      <div class="nav">NAV ₹171.62</div>
+    </div>
+    <div class="note">Samir Rachh continues as lead PM (since 2017). Outperforming Nifty Smallcap 250 across 1Y / 3Y / 5Y. 96% equity, 4% cash - very little dry powder. The size of this fund (largest small-cap by far) is itself the chief structural concern; watch for category caps from SEBI in future quarters.</div>
+  </div>
+
+  <div class="fund flagged">
+    <div class="top">
+      <div class="name"><span class="flag-tag">Flagged</span>Motilal Oswal Midcap</div>
+      <div class="nav">NAV ₹104.73</div>
+    </div>
+    <div class="note">See "Watching Closely" above.</div>
+  </div>
+
+  <div class="fund flagged">
+    <div class="top">
+      <div class="name"><span class="flag-tag">Flagged</span>Quant Multi Cap</div>
+      <div class="nav">NAV under pressure</div>
+    </div>
+    <div class="note">See "Watching Closely" above.</div>
+  </div>
+
+  <div class="fund">
+    <div class="top">
+      <div class="name">JM Flexicap</div>
+      <div class="nav">NAV ₹106.99</div>
+    </div>
+    <div class="note">Six-manager structure (Satish Ramanathan, Asit Bhandarkar, Chaitanya Choksi, Ruchi Fozdar, Gurvinder Wasan, Deepak Gupta). Five-year annualised at 17.65%. No reported changes this week. The lean AUM (₹13,427 cr) leaves room to keep nimble in mid-cap allocations.</div>
+  </div>
+
+  <div class="fund">
+    <div class="top">
+      <div class="name">HDFC Silver ETF FoF</div>
+      <div class="nav">NAV ₹46.74</div>
+    </div>
+    <div class="note">Silver's rally past $4,720/oz (multi-week high) is the story; the fund has returned 138% over 1Y and 51% CAGR over 3Y. With Brent above $100 and gold near records, the diversification role is doing exactly what it was added for. No fund-level changes.</div>
+  </div>
+
+  <div class="fund">
+    <div class="top">
+      <div class="name">Bandhan Small Cap</div>
+      <div class="nav">NAV ₹52.31</div>
+    </div>
+    <div class="note">Managed by Manish Gunwani + Kirthi Jain. Notable portfolio action: 72,000 shares of SOBHA Limited added on May 7 - a measured real-estate tilt. 1Y return 12.49%, 3Y 126%. No governance flags.</div>
+  </div>
+
+  <div class="fund">
+    <div class="top">
+      <div class="name">ICICI Prudential Value</div>
+      <div class="nav">NAV ₹499.93</div>
+    </div>
+    <div class="note">Sharmila D'Silva continues at the helm. AUM ₹59,588 cr. Overweight pharma, power, software; underweight banks and financials - a clear contrarian posture given the PSU Bank index fell 3% on Friday. 1Y returns flat (0.14%) reflect the value style's recent drag, not a manager problem.</div>
+  </div>
+
+  <div class="fund">
+    <div class="top">
+      <div class="name">HSBC Value</div>
+      <div class="nav">NAV ₹127.20</div>
+    </div>
+    <div class="note">Co-managed by Venugopal Manghat and Mayank Chaturvedi. Net assets ₹13,371 cr. 1Y return 18.38%, well above ICICI Value despite the same style - reflecting smaller-cap tilt within the value mandate. No changes this week.</div>
+  </div>
+
+  <!-- NEW LAUNCHES -->
+  <h2>Launched This Week</h2>
+
+  <div class="nfo">
+    <div class="name">Axis Nifty Capital Markets Index Fund</div>
+    <div class="meta">NFO May 4 - May 15 · Passive index · Tracks Nifty Capital Markets TRI · Min ₹100</div>
+  </div>
+
+  <div class="nfo">
+    <div class="name">SBI Nifty Smallcap 250 ETF</div>
+    <div class="meta">NFO May 7 - May 18 · Still open · Passive · Broad small-cap exposure</div>
+  </div>
+
+  <div class="nfo">
+    <div class="name">DSP Nifty FMCG ETF</div>
+    <div class="meta">NFO May 12 - May 14 · Passive sector ETF</div>
+  </div>
+
+  <p class="muted" style="font-size: 13.5px; margin-top: 14px;">Nippon India has filed draft papers for a Gold + Silver Passive FoF - dual precious-metal exposure in one wrapper. No launch date yet.</p>
+
+  <!-- WORTH A LOOK -->
+  <h2>Worth a Look</h2>
+
+  <div class="pick">
+    <div class="label">Editor's note · One pick</div>
+    <h3>Axis Nifty Capital Markets Index Fund</h3>
+    <p>The most interesting NFO this week, and not for the obvious reason. The fund tracks the Nifty Capital Markets TRI - a basket of exchanges, depositories, registrars, brokers, and AMCs themselves. It's an explicit bet on the <em>infrastructure</em> of Indian financialisation rather than on any specific market direction.</p>
+    <p>The underlying thesis: Indian household financial-asset allocation is still 5-6% in equities versus 50%+ in real estate and gold. As that share moves toward the global norm over the next decade, the entities that <em>process</em> the flows - not the stocks that benefit from them - capture the most predictable economics. Exchanges earn per-transaction. Depositories earn per-account. AMCs earn on AUM growth regardless of which fund wins. It's the "picks and shovels" framing applied to the equity culture story.</p>
+    <p>NFO already closed; available post-listing through normal SIPs and lumpsum. Expense ratio for an index fund will be at the lower end (likely 25-35 bps).</p>
+    <p class="skiprow"><strong>Skip if:</strong> your portfolio is already mid-cap heavy. Capital markets companies skew mid-cap by weight, which would compound your existing exposure to Motilal Oswal Midcap, Nippon Small Cap, and Bandhan Small Cap.</p>
+  </div>
+
+  <!-- REGULATORY BACKDROP -->
+  <h2>Regulatory Backdrop</h2>
+
+  <p>SEBI's revised Mutual Fund Regulations 2026 took effect April 1, reshaping the framework most investors will quietly benefit from over the next year:</p>
+  <p style="font-size: 15px;"><strong>Lower TERs across categories.</strong> Restructured slabs reduce expense ratios on equity funds by roughly 5-15 bps depending on AUM tier - meaningful compounding over 10+ year horizons.</p>
+  <p style="font-size: 15px;"><strong>Performance-fee plans permitted.</strong> AMCs can now offer schemes where the fee scales with returns above a benchmark. Optional for now; watch for whether your AMCs introduce them and on what terms.</p>
+  <p style="font-size: 15px;"><strong>50% portfolio overlap cap.</strong> No thematic or sectoral fund in the same AMC can share more than half its portfolio with another scheme. If breached, AMC must rebalance in 30 days; failing that, investors can exit without exit load.</p>
+  <p style="font-size: 15px;"><strong>Enhanced governance and disclosure norms</strong> - more granular AMC-level risk reporting and trustee accountability.</p>
+
+  <!-- FOOTER / METHOD -->
+  <footer>
+    <div class="heading">What I'm Watching For</div>
+    <div>Fund manager exits or replacements. SEBI investigations, show-cause notices, mandate breaches. Single-month AUM bleed exceeding 5% of fund size. Mandate or category reclassifications. TER hikes beyond category median. Portfolio overlap above SEBI's 50% threshold within an AMC. Sustained 12-month underperformance vs category median where the manager hasn't changed.</div>
+    <div class="small">Weekly brief, auto-generated Saturday morning IST. Not investment advice. Always read scheme documents and consider your own circumstances.</div>
+  </footer>
+
+</div>
+</body>
+</html>
